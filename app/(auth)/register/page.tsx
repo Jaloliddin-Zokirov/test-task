@@ -1,14 +1,32 @@
 "use client";
 
+import { postRegister } from "@/api/auth/register";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const Register = () => {
   const router = useRouter();
 
   const [data, setData] = useState({ name: "", surname: "", phone: "", password: "", passwordConfirmation: "" });
+
+  const handleRegister = async () => {
+    if (data.password !== data.passwordConfirmation) {
+      toast.error("Parollar mos emas");
+      return;
+    }
+    try {
+      const response = await postRegister(data) as RegisterResponse;
+      localStorage.setItem("access_token", response.access);
+      toast.success("Muvaffaqiyatli ro'yxatdan o'tildi");
+      router.push("/teacher");
+    } catch (error) {
+      console.error("Login failed:", error);
+      toast.error("Ro'yxatdan o'tishda xatolik yuz berdi");
+    }
+  };
 
   return (
     <div className="w-5/6 h-full mx-auto flex items-center justify-between gap-0.5">
@@ -61,10 +79,7 @@ const Register = () => {
 
           <Button
             className="w-full bg-white text-black mb-4 cursor-pointer"
-            onClick={() => {
-              localStorage.setItem("access_token", JSON.stringify(data));
-              router.push("/teacher");
-            }}
+            onClick={handleRegister}
           >
             Kirish
           </Button>

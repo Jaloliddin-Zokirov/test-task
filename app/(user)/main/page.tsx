@@ -5,6 +5,7 @@ import Step1 from "./(steps)/Step1"
 import { toast } from "sonner";
 import Step2 from "./(steps)/Step2";
 import Step3 from "./(steps)/Step3";
+import { postQuizzesJoin } from "@/api/quizzes/room";
 
 
 const UserPage = () => {
@@ -22,12 +23,23 @@ const UserPage = () => {
   }, [otp])
 
   useEffect(() => {
-    if (name.length >= 4) {
-      console.log("Name entered:", name);
-      // Here you can add logic to verify the name or proceed to the next step
-      toast.success("Ism muvaffaqiyatli kiritildi!");
-      setStep(3);
+    const joinQuestion = async () => {
+      try {
+        if (name.length >= 4 && otp.length === 6) {
+          const response = await postQuizzesJoin({ room_code: otp, name: name });
+          localStorage.setItem("room_code", JSON.stringify(otp));
+          console.log("Name entered:", name);
+          toast.success("Ism muvaffaqiyatli kiritildi!");
+          setStep(3);
+        } 
+      } catch (error) {
+        console.error("Error joining question:", error);
+        toast.error("Testga qo'shilishda muammo yuzaga keldi iltimos qayta urinib ko'ring!");
+        setStep(1);
+      }
     }
+
+    joinQuestion();
   }, [name])
 
 

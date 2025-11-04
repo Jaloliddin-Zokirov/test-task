@@ -12,6 +12,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { postQuizzes } from "@/api/quizzes/quizzes";
 
 const CreateAloneTest = () => {
   const router = useRouter();
@@ -32,23 +34,39 @@ const CreateAloneTest = () => {
     setAnswers(newAnswers);
   };
 
-  const StartTest = () => {
-    router.push("/teacher/management/process");
+  const StartTest = async () => {
+    const data = {
+      title: "Yakka tartibli test",
+      questions: tests,
+    };
+
+    try {
+      const response = await postQuizzes(data) as any;
+      console.log(response);
+      localStorage.setItem("room_code", JSON.stringify(response.room_code));
+      localStorage.setItem("quiz_id", JSON.stringify(response.id));
+      toast.success("Test muvaffaqiyatli yuborildi!");
+      router.push("/teacher/management/process");
+    } catch (error) {
+      toast.error("Testni yuborishda xatolik yuz berdi!");
+    }
   }
 
   const addTest = () => {
     if (!question.trim() || answers.some(a => !a.trim()) || !correctAnswer) {
-      alert("Iltimos, barcha maydonlarni to‘ldiring!");
+      toast.error("Iltimos, barcha maydonlarni to‘ldiring!");
       return;
     }
 
-    const newTest = {
-      question,
-      answers,
-      correctAnswer,
+    const data = {
+      text: question,
+      choices: answers.map((a) => ({
+        text: a,
+        is_correct: a === correctAnswer,
+      })),
     };
 
-    setTests([...tests, newTest]);
+    setTests([...tests, data]);
     setQuestion("");
     setAnswers(["", ""]);
     setCorrectAnswer("");

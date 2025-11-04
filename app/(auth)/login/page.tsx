@@ -1,14 +1,28 @@
 "use client";
 
+import { postLogin } from "@/api/auth/login";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const Login = () => {
   const router = useRouter();
 
   const [data, setData] = useState({ phone: "", password: "" });
+
+  const handleLogin = async () => {
+    try {
+      const response = await postLogin(data) as LoginResponse;
+      localStorage.setItem("access_token", response.access);
+      toast.success("Muvaffaqiyatli kirildi");
+      router.push("/teacher");
+    } catch (error) {
+      console.error("Login failed:", error);
+      toast.error("Kirishda xatolik yuz berdi");
+    }
+  };
 
   return (
     <div className="w-5/6 h-full mx-auto flex items-center justify-between gap-0.5">
@@ -40,10 +54,7 @@ const Login = () => {
 
           <Button
             className="w-full bg-white text-black mb-10 cursor-pointer"
-            onClick={() => {
-              localStorage.setItem("access_token", JSON.stringify(data));
-              router.push("/teacher");
-            }}
+            onClick={handleLogin}
           >
             Kirish
           </Button>
