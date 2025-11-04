@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
 
+const isClient = typeof window !== 'undefined';
+
 interface Choice {
   id: number;
   text: string;
@@ -24,8 +26,11 @@ const Tests = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [allAnswered, setAllAnswered] = useState(false);
   const [timer, setTimer] = useState<number>(() => {
-    const savedTimer = localStorage.getItem("timer");
-    return savedTimer ? JSON.parse(savedTimer) : 0;
+    if (isClient) {
+      const savedTimer = localStorage.getItem("timer");
+      return savedTimer ? JSON.parse(savedTimer) : 0;
+    }
+    return 0;
   });
   const [answers, setAnswers] = useState<{ [key: number]: { choice_id: number, latency_ms: number } }>({});
   const answerStartRef = useRef(Date.now()); // Savolga javob bosilganda vaqtni hisoblash uchun
@@ -39,6 +44,8 @@ const Tests = () => {
   }, [timer]);
 
   const sendAnswers = async (answersObj: typeof answers) => {
+    if (!isClient) return;
+
     const room_code = JSON.parse(localStorage.getItem("room_code") || "null");
     const student_idStr = localStorage.getItem("student_id");
 
@@ -67,12 +74,16 @@ const Tests = () => {
   };
 
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("questions") || "[]");
-    setQuestions(saved);
+    if (isClient) {
+      const saved = JSON.parse(localStorage.getItem("questions") || "[]");
+      setQuestions(saved);
+    }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("timer", JSON.stringify(timer));
+    if (isClient) {
+      localStorage.setItem("timer", JSON.stringify(timer));
+    }
   }, [timer]);
 
   useEffect(() => {
@@ -126,9 +137,9 @@ const Tests = () => {
       <div className="w-2xl place-items-center justify-center flex flex-col gap-4">
         {!allAnswered ? (
           <>
-            <h2 className="absolute top-4 w-2xl text-4xl font-bold py-4! bg-black text-white text-center rounded-2xl">To’g’ri javobni tanlang</h2>
+            <h2 className="absolute top-4 w-2xl text-4xl font-bold !py-4 bg-black text-white text-center rounded-2xl">To’g’ri javobni tanlang</h2>
             <div className="absolute top-36 bg-black rounded-2xl py-2 px-8">
-              <h3 className="w-full text-4xl font-bold py-4! bg-black text-white text-center rounded-2xl">{currentQuestion.text}</h3>
+              <h3 className="w-full text-4xl font-bold !py-4 bg-black text-white text-center rounded-2xl">{currentQuestion.text}</h3>
             </div>
             
             <ol className="flex items-center gap-4">
