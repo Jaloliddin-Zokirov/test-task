@@ -15,8 +15,6 @@ const UserPage = () => {
 
   useEffect(() => {
     if (otp.length === 6) {
-      console.log("OTP entered:", otp);
-      // Here you can add logic to verify the OTP or proceed to the next step
       toast.success("Kodni muvaffaqiyatli kiritdingiz!");
       setStep(2);
     }
@@ -26,9 +24,13 @@ const UserPage = () => {
     const joinQuestion = async () => {
       try {
         if (name.length >= 4 && otp.length === 6) {
-          const response = await postQuizzesJoin({ room_code: otp, name: name });
+          const response = await postQuizzesJoin({ room_code: otp, name: name }) as { student?: { id: string | number } | null };
+          const studentId = response?.student?.id;
+          if (!studentId) {
+            throw new Error("Missing student id in response");
+          }
+          localStorage.setItem("student_id", JSON.stringify(studentId));
           localStorage.setItem("room_code", JSON.stringify(otp));
-          console.log("Name entered:", name);
           toast.success("Ism muvaffaqiyatli kiritildi!");
           setStep(3);
         } 

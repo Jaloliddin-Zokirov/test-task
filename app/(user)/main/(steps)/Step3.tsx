@@ -8,14 +8,12 @@ import { toast } from "sonner";
 
 const Step3 = () => {
   const router = useRouter();
-  const [roomCode, setRoomCode] = useState<string | null>(null);
   const [students, setStudents] = useState<{ name: string }[]>([]);
 
   useEffect(() => {
     const code = localStorage.getItem("room_code");
     if (code) {
       const parsedCode = JSON.parse(code);
-      setRoomCode(parsedCode);
 
       const socket = new WebSocket(
         `wss://test-task-backend-production-80c6.up.railway.app/ws/quizzes/${parsedCode}/`
@@ -23,9 +21,17 @@ const Step3 = () => {
 
       socket.onmessage = (event) => {
         const message = JSON.parse(event.data);
-        toast.success("Yangi o'quvchi qo'shildi");
         if (message.event === "student_joined") {
+          toast.success("Yangi o'quvchi qo'shildi");
           setStudents(message.payload.students);
+        }
+        if (message.event === 'quiz_started') {
+          toast.success("Test boshlandi!");
+          const { quiz, time_remaining } = message.payload;
+          localStorage.setItem("quiz_id", JSON.stringify(quiz.id));
+          localStorage.setItem("questions", JSON.stringify(quiz.questions));
+          localStorage.setItem("timer", time_remaining);
+          router.push("/tests");
         }
       };
 
@@ -37,18 +43,6 @@ const Step3 = () => {
       return () => socket.close();
     }
   }, []);
-
-  // const arr = [{name: "Abdulloh"}, {name: "Doniyor"}, {name: "Doniyor"}, {name: "Doniyor"}, {name: "Doniyor"}, {name: "Doniyor"}, {name: "Doniyor"}, {name: "Doniyor"}, {name: "Doniyor"}, {name: "Doniyor"}, {name: "Doniyor"}, {name: "Doniyor"}, {name: "Doniyor"}, {name: "Doniyor"}, {name: "Doniyor"}, {name: "Doniyor"}, {name: "Doniyor"}, {name: "Doniyor"}, {name: "Doniyor"}]
-
-  // useEffect(() => {
-  //   if (arr.length === 20) {
-  //     console.log("20 o'quvchi to'ldi");
-  //     toast.success("20 ta o'quvchi qo'shildi!");
-  //     router.push("/tests");
-  //     // Here you can add logic to proceed when 20 students have joined
-  //   }
-  // }, [arr, router])
-  
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center gap-4">

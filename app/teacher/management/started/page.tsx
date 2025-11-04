@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 const Started = () => {
   const router = useRouter();
-  const [timeLeft, setTimeLeft] = useState(120);
+  const [timeLeft, setTimeLeft] = useState(60);
 
   useEffect(() => {
     const interval = setInterval(async () => {

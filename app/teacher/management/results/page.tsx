@@ -11,7 +11,7 @@ const Results = () => {
           
           <p className="font-bold text-3xl mb-2">G'olib:</p>
           <div className="w-xs h-32 bg-black rounded-2xl py-2 px-8 place-items-center justify-center flex flex-col gap-4 cursor-pointer">
-            <p className="w-full mx-auto text-xl font-bold py-2 bg-black text-white text-center rounded-2xl">{topStudent?.name} {topStudent?.score}% to’g’ri</p>
+            <p className="w-full mx-auto text-xl font-bold py-2 bg-black text-white text-center rounded-2xl">{topStudent?.name} {topStudent?.percentage}% to’g’ri</p>
           </div>
           
         </div>

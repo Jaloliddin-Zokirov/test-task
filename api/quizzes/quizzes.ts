@@ -20,6 +20,19 @@ export function postQuizzesJoin(payload: { [key: string]: any }) {
   });
 }
 
+export function postQuizzesAnswers(room_code: string, student_id: number, payload: { [key: string]: any }) {
+  return apiClient(`/quizzes/room/${room_code}/students/${student_id}/answers/`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function postQuizzesResults(room_code: string, student_id: number) {
+  return apiClient(`/quizzes/room/${room_code}/students/${student_id}/results/`, {
+    method: "GET",
+  });
+}
+
 export function postQuizzesStart(id: number, payload: { [key: string]: any }) {
   return apiClient(`/quizzes/${id}/start/`, {
     method: "POST",
